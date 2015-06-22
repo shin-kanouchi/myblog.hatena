@@ -44,7 +44,7 @@ F2  |非負整数      |ツイートで「crazy」という単語が用いられ
 
 入力Xが与えられた時に出力Yが得られる確率 [tex:P(Y|X)] は，ベイズの定理より，
 
-> [tex:\displaystyleP(Y|X) = \frac{P(Y) P(X|Y)}{P(X)}]
+> [tex:\displaystyle P(Y|X) = \frac{P(Y) P(X|Y)}{P(X)}]
 
 で，この確率が最大となるYを求めるときに [tex:P(X)] は定数なので，
 
@@ -56,21 +56,21 @@ F2  |非負整数      |ツイートで「crazy」という単語が用いられ
 
 > [tex:\displaystyle 事後確率 = \frac{事前確率・尤度}{証拠} ]
 
-- 事後確率: [tex:P(C|F_1, F_2)]
+- 事後確率: [tex: P(C|F_1, F_2)]
 	- 入力が与えられた場合に，そのデータがクラス C に属する確率
-- 事前確率: [tex:P(C)]
+- 事前確率: [tex: P(C)]
 	- データ情報がない場合に，そのデータがクラス C に属する確率
-- 証拠: [tex:P(F_1, F_2)]
+- 証拠: [tex: P(F_1, F_2)]
 	- 特徴量が F1 と F2 をとる確率
 	- この値は訓練データにおいて，該当する特徴量が全体に占める割合
-- 尤度: [tex:P(F_1, F_2|C)]
+- 尤度: [tex: P(F_1, F_2|C)]
 	- もしあるデータがクラスCに属する場合，特徴量が F1 と F2 である確率がいくらか
 
 
 
 確率理論から，
 
-> [tex:P(F_1, F_2|C) = P(F_1|C)P(F_2|C, F_1)]
+> [tex: P(F_1, F_2|C) = P(F_1|C)P(F_2|C, F_1)]
 
 ？？？？？
 
@@ -165,7 +165,7 @@ crazy | negative
 
 <br>
 ###2.3. 新出単語への対応
-- ここでは最も簡単なラプラス・スムージングを使う
+- 最も簡単なラプラス・スムージングは
 
 > [tex:\displaystyle P(F_1 = 1|C="pos") = \frac{3}{4} = 0.75]
 
@@ -182,11 +182,12 @@ crazy | negative
 
 以前考えた Cbest について考えると，
 
-> [tex: Cbest = argmax \log{P(C = c) P(F_1|C =c) P(F_2|C =c)} = argmax( \log{P(C = c)}  + \log{P(F_1|C =c)} + \log{P(F_2|C =c}) ]
+> [tex: Cbest = argmax \log{P(C = c) P(F_1|C =c) P(F_2|C =c)} ]
+> [tex: Cbest = argmax( \log{P(C = c)}  + \log{P(F_1|C =c)} + \log{P(F_2|C =c)}) ]
 
 任意の数 (k個) の特徴量を用いた場合の式は以下になる．
 
-> [tex: Cbest = argmax( \log{P(C = c)}  +\sum_{k} \log{P(F_k|C =c})) ]
+> [tex: Cbest = argmax( \log{P(C = c)}  +\sum_{k} \log{P(F_k|C =c)}) ]
 
 <br>
 ###3.1. scikit-learn を用いたナイーブベイズ分類器の作成
@@ -296,15 +297,15 @@ train_model(create_ngram_model, npX, npY, name="pos vs neg", plot=True)
         - 3gram (1,3)
     -  min_df
         - 1 or 2 
-    - TF-IDFにおけるIDFの影響を検証するため、use_idfとsmooth_idfを試す
+    - TF-IDFにおけるIDFの影響を検証するため，use_idfとsmooth_idfを試す
     - ストップワードを用いるかどうか
     - 単語の頻度(sublinear_tf)について対数を用いるかどうか
     - 記録する対象を単語の出現回数(頻度)か単語の出現の有無にするか
 
 - MultinomialNB
-    - スムージングについてを検証
+    - スムージングについて検証
     - ラプラス・スムージング: 1
-    - Lidstone スムージング: 0.01、0.05、0.1、0.5
+    - Lidstone スムージング: 0.01，0.05，0.1，0.5
     - スムージングなし: 0
 
 - 正確にやろうと思えば，全ての組み合わせで訓練を行う必要がある
@@ -361,7 +362,7 @@ def train_model(clf_factory, X, Y, name="NB ngram", plot=False):
     for train, test in cv:
         X_train, y_train = X[train], Y[train]
         X_test, y_test = X[test], Y[test]
-        clf = clf_factory()
+        clf = clf_factory
         clf.fit(X_train, y_train)
         train_score = clf.score(X_train, y_train)
         test_score = clf.score(X_test, y_test)
@@ -375,11 +376,6 @@ def train_model(clf_factory, X, Y, name="NB ngram", plot=False):
         precisions.append(precision)
         recalls.append(recall)
         thresholds.append(pr_thresholds)
-    if plot:
-        scores_to_sort = pr_scores
-        median = np.argsort(scores_to_sort)[len(scores_to_sort) / 2]
-        plot_pr(pr_scores[median], name, phase, precisions[median],
-                recalls[median], label=name)
     summary = (np.mean(scores), np.std(scores),
                np.mean(pr_scores), np.std(pr_scores))
     print "%.3f\t%.3f\t%.3f\t%.3f\t" % summary
@@ -393,15 +389,15 @@ def get_best_model():
                        vect__use_idf=False,
                        vect__sublinear_tf=True,
                        vect__binary=False,
-                       clf__alpha=0.01,
+                       clf__alpha=0,
                        )
     best_clf = create_ngram_model(best_params)
     return best_clf
 
 
 best_clf = grid_search_model(create_ngram_model, npX, npY)
-train_model(get_best_model, npX, npY, name="pos vs neg", plot=True)
-
+train_model(get_best_model(), npX, npY, name="pos vs neg")
+train_model(best_clf, npX, npY, name="pos vs neg2")
 ```
 
 
@@ -412,8 +408,8 @@ train_model(get_best_model, npX, npY, name="pos vs neg", plot=True)
 >        ngram_range=(1, 1), norm=u'l2', preprocessor=None, smooth_idf=True,...ue,
 >        vocabulary=None)), ('clf', MultinomialNB(alpha=0.05, class_prior=None, fit_prior=True))])
 
-そしてそのパラメータで精度を測定すると，`0.829	0.017	0.890	0.023`となり，
-パラメータを最適化することで，Accuracy が9.5ポイント上昇している．
+そしてそのパラメータで精度を測定すると，`0.838	0.017	0.890	0.023`となり，
+パラメータを最適化することで，Accuracy が10.4ポイント上昇している．
 
 <br>
 ###3.3. ツイートを前処理する
@@ -432,6 +428,9 @@ train_model(get_best_model, npX, npY, name="pos vs neg", plot=True)
 
 ###3.4. 品詞を考える
 - 今までは Bag of Words しか考えていなかった
+- 直感的には
+    - 感情が含まれないツイートには「名詞」の割合が多く
+    - 感情を含んだツイートには「形容詞」や「動詞」が多く含まれそう
 - nltk.pos_tag() を使うことで品詞を考慮
 
 ###3.5. SentiWordNet を活用する
